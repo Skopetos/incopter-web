@@ -80,20 +80,8 @@ import Layout from '../layouts/Layout.astro';
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
 
-        <!-- image placeholder -->
-        <div class="aspect-video rounded-2xl border-2 border-dashed border-brand-border flex flex-col items-center justify-center gap-3 bg-brand-card/30">
-          <svg class="w-16 h-16 text-brand-border" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-            <circle cx="12" cy="12" r="3"/>
-            <line x1="12" y1="12" x2="4.5"  y2="4.5"/>
-            <line x1="12" y1="12" x2="19.5" y2="4.5"/>
-            <line x1="12" y1="12" x2="4.5"  y2="19.5"/>
-            <line x1="12" y1="12" x2="19.5" y2="19.5"/>
-            <circle cx="4.5"  cy="4.5"  r="2.5"/>
-            <circle cx="19.5" cy="4.5"  r="2.5"/>
-            <circle cx="4.5"  cy="19.5" r="2.5"/>
-            <circle cx="19.5" cy="19.5" r="2.5"/>
-          </svg>
-          <p class="text-slate-600 text-sm">Εδώ θα μπει φωτογραφία του drone</p>
+        <div class="aspect-video rounded-2xl overflow-hidden">
+          <img src="/images/5.jpg" alt="Ο Εξοπλισμός μας" class="w-full h-full object-cover rounded-2xl" />
         </div>
 
         <!-- specs grid -->
