@@ -170,7 +170,8 @@ import Layout from '../layouts/Layout.astro';
 </style>
 
 <script>
-  const API_URL = import.meta.env.PUBLIC_API_URL ?? 'http://localhost:8080';
+  // Empty string in production → relative URL (/api/contact), proxied by Caddy on the same domain
+  const API_URL = (import.meta.env.PUBLIC_API_URL ?? '').replace(/\/$/, '');
 
   const form     = document.getElementById('contact-form') as HTMLFormElement;
   const feedback = document.getElementById('form-feedback') as HTMLDivElement;

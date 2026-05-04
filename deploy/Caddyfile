@@ -1,0 +1,22 @@
+# Primary domain — serves the site + proxies API to Rust backend
+incopter.gr, www.incopter.gr {
+    # Static frontend files
+    root * /var/www/incopter
+    file_server
+
+    # Proxy contact form API to Rust backend
+    handle /api/* {
+        reverse_proxy localhost:8080
+    }
+
+    # SPA-style fallback (404 → index.html)
+    handle_errors {
+        rewrite * /index.html
+        file_server
+    }
+}
+
+# Redirect .com → .gr (permanent 301)
+incopter.com, www.incopter.com {
+    redir https://incopter.gr{uri} permanent
+}

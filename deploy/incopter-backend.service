@@ -1,0 +1,15 @@
+[Unit]
+Description=Incopter Backend (Rust/Axum)
+After=network.target
+
+[Service]
+Type=simple
+User=incopter
+WorkingDirectory=/opt/incopter-backend
+EnvironmentFile=/opt/incopter-backend/.env
+ExecStart=/opt/incopter-backend/incopter-backend
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
