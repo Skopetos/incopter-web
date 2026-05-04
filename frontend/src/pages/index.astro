@@ -131,20 +131,11 @@ import Layout from '../layouts/Layout.astro';
 
         <!-- image placeholder -->
         <div class="relative aspect-video lg:aspect-square max-w-lg mx-auto lg:mx-0 w-full">
-          <div class="w-full h-full rounded-2xl border-2 border-dashed border-brand-border flex flex-col items-center justify-center gap-4 bg-brand-card/30">
-            <svg class="w-16 h-16 text-brand-border" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-              <circle cx="12" cy="12" r="3"/>
-              <line x1="12" y1="12" x2="4.5"  y2="4.5"/>
-              <line x1="12" y1="12" x2="19.5" y2="4.5"/>
-              <line x1="12" y1="12" x2="4.5"  y2="19.5"/>
-              <line x1="12" y1="12" x2="19.5" y2="19.5"/>
-              <circle cx="4.5"  cy="4.5"  r="2.5"/>
-              <circle cx="19.5" cy="4.5"  r="2.5"/>
-              <circle cx="4.5"  cy="19.5" r="2.5"/>
-              <circle cx="19.5" cy="19.5" r="2.5"/>
-            </svg>
-            <p class="text-slate-600 text-sm">Εδώ θα μπει η φωτογραφία του drone</p>
-          </div>
+          <img
+            src="/images/thedrone.jpg"
+            alt="Incopter Drone"
+            class="w-full h-full object-cover rounded-2xl"
+          />
           <!-- accent corner -->
           <div class="absolute -top-3 -right-3 w-24 h-24 border-t-2 border-r-2 border-brand-accent rounded-tr-2xl"></div>
           <div class="absolute -bottom-3 -left-3 w-24 h-24 border-b-2 border-l-2 border-brand-accent rounded-bl-2xl"></div>
