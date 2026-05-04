@@ -9,9 +9,9 @@ export default {
           surface: '#0d1117',
           card:    '#111827',
           border:  '#1f2937',
-          accent:  '#f97316',
-          'accent-dark': '#c2410c',
-          'accent-glow': 'rgba(249,115,22,0.15)',
+          accent:  '#dc2626',
+          'accent-dark': '#b91c1c',
+          'accent-glow': 'rgba(220,38,38,0.15)',
         },
       },
       fontFamily: {
