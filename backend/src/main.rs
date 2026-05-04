@@ -4,11 +4,6 @@ use axum::{
     routing::{get, post},
     Router,
 };
-use lettre::{
-    message::header::ContentType,
-    transport::smtp::authentication::Credentials,
-    AsyncSmtpTransport, AsyncTransport, Message, Tokio1Executor,
-};
 use serde::{Deserialize, Serialize};
 use tower_http::cors::CorsLayer;
 
@@ -44,54 +39,53 @@ async fn contact_handler(
         return err(StatusCode::BAD_REQUEST, "Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία.");
     }
 
-    let smtp_user = std::env::var("SMTP_USER").unwrap_or_default();
-    let smtp_pass = std::env::var("SMTP_PASS").unwrap_or_default();
-    let to_email  = std::env::var("TO_EMAIL").unwrap_or_else(|_| "incopter.info@gmail.com".into());
+    let api_key  = std::env::var("RESEND_API_KEY").unwrap_or_default();
+    let to_email = std::env::var("TO_EMAIL").unwrap_or_else(|_| "incopter.info@gmail.com".into());
+    let from     = std::env::var("FROM_EMAIL").unwrap_or_else(|_| "noreply@incopter.gr".into());
 
     let body = format!(
-        "Νέο μήνυμα από τη φόρμα επικοινωνίας\n\
-         ──────────────────────────────────────\n\
-         Όνομα:     {}\n\
-         Email:     {}\n\
-         Τηλέφωνο:  {}\n\
-         Υπηρεσία:  {}\n\
-         ──────────────────────────────────────\n\
-         Μήνυμα:\n\n{}\n",
-        form.name, form.email,
+        "<p><strong>Όνομα:</strong> {}</p>\
+         <p><strong>Email:</strong> {}</p>\
+         <p><strong>Τηλέφωνο:</strong> {}</p>\
+         <p><strong>Υπηρεσία:</strong> {}</p>\
+         <hr/>\
+         <p><strong>Μήνυμα:</strong><br/>{}</p>",
+        form.name,
+        form.email,
         if form.phone.is_empty() { "—".into() } else { form.phone.clone() },
         if form.service.is_empty() { "—".into() } else { form.service.clone() },
-        form.message,
+        form.message.replace('\n', "<br/>"),
     );
 
-    let email = match Message::builder()
-        .from(smtp_user.parse().unwrap_or_else(|_| "noreply@incopter.gr".parse().unwrap()))
-        .to(to_email.parse().unwrap())
-        .reply_to(form.email.parse().unwrap_or_else(|_| smtp_user.parse().unwrap()))
-        .subject(format!("Incopter – Μήνυμα από {}", form.name))
-        .header(ContentType::TEXT_PLAIN)
-        .body(body)
-    {
-        Ok(e) => e,
-        Err(e) => {
-            tracing::error!("Failed to build email: {e}");
-            return err(StatusCode::INTERNAL_SERVER_ERROR, "Σφάλμα κατά τη δημιουργία email.");
-        }
-    };
+    let payload = serde_json::json!({
+        "from":    from,
+        "to":      [to_email],
+        "reply_to": form.email,
+        "subject": format!("Incopter – Μήνυμα από {}", form.name),
+        "html":    body,
+    });
 
-    let creds   = Credentials::new(smtp_user, smtp_pass);
-    let mailer  = match AsyncSmtpTransport::<Tokio1Executor>::relay("smtp.gmail.com") {
-        Ok(t) => t.credentials(creds).build(),
-        Err(e) => {
-            tracing::error!("SMTP relay error: {e}");
-            return err(StatusCode::INTERNAL_SERVER_ERROR, "Σφάλμα σύνδεσης SMTP.");
-        }
-    };
+    let client = reqwest::Client::new();
+    let res = client
+        .post("https://api.resend.com/emails")
+        .header("Authorization", format!("Bearer {}", api_key))
+        .json(&payload)
+        .send()
+        .await;
 
-    match mailer.send(email).await {
-        Ok(_)  => ok("Το μήνυμά σας εστάλη επιτυχώς! Θα επικοινωνήσουμε μαζί σας σύντομα."),
-        Err(e) => {
-            tracing::error!("Failed to send email: {e}");
+    match res {
+        Ok(r) if r.status().is_success() => {
+            ok("Το μήνυμά σας εστάλη επιτυχώς! Θα επικοινωνήσουμε μαζί σας σύντομα.")
+        }
+        Ok(r) => {
+            let status = r.status();
+            let text = r.text().await.unwrap_or_default();
+            tracing::error!("Resend error {}: {}", status, text);
             err(StatusCode::INTERNAL_SERVER_ERROR, "Σφάλμα αποστολής. Δοκιμάστε ξανά ή επικοινωνήστε τηλεφωνικά.")
+        }
+        Err(e) => {
+            tracing::error!("Resend request failed: {e}");
+            err(StatusCode::INTERNAL_SERVER_ERROR, "Σφάλμα δικτύου. Δοκιμάστε ξανά ή επικοινωνήστε τηλεφωνικά.")
         }
     }
 }
