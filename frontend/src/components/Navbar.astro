@@ -94,14 +94,18 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 </header>
 
 <script>
-  const btn   = document.getElementById('menu-btn');
-  const menu  = document.getElementById('mobile-menu');
-  const open  = document.getElementById('icon-open');
-  const close = document.getElementById('icon-close');
+  function initMenu() {
+    const btn   = document.getElementById('menu-btn');
+    const menu  = document.getElementById('mobile-menu');
+    const open  = document.getElementById('icon-open');
+    const close = document.getElementById('icon-close');
 
-  btn?.addEventListener('click', () => {
-    const hidden = menu?.classList.toggle('hidden');
-    open?.classList.toggle('hidden', !hidden);
-    close?.classList.toggle('hidden', hidden ?? true);
-  });
+    btn?.addEventListener('click', () => {
+      const hidden = menu?.classList.toggle('hidden');
+      open?.classList.toggle('hidden', !hidden);
+      close?.classList.toggle('hidden', hidden ?? true);
+    });
+  }
+
+  document.addEventListener('astro:page-load', initMenu);
 </script>
